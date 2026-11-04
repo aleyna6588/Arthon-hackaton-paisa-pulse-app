@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PaisaPulse – UPI budget, scam shield & tax helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Instrument+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#eaf3ee;--card:#fbfdfb;--ink:#0e3b3a;--mute:#5b7a76;--pink:#d6336c;--amber:#f2a900;--green:#1a9e6b;--line:#cfe0d8}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1f1e;--card:#112a28;--ink:#e3f4ee;--mute:#8fb0a9;--line:#244541}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'Instrument Sans',system-ui,sans-serif}
+h1,h2,h3,.big{font-family:'Bricolage Grotesque',system-ui,sans-serif;margin:0}
+header{padding:28px 20px 8px;max-width:960px;margin:auto}
+h1{font-size:clamp(2.2rem,7vw,4rem);font-weight:800;letter-spacing:-.03em;line-height:1}
+h1 span{display:inline-block;background:var(--pink);color:#fff;padding:0 .2em;border-radius:.2em;transform:rotate(-2deg)}
+header p{color:var(--mute);max-width:52ch;margin:10px 0 0}
+nav{display:flex;gap:8px;max-width:960px;margin:18px auto 0;padding:0 20px;flex-wrap:wrap}
+nav button{border:2px solid var(--ink);background:transparent;color:var(--ink);padding:9px 16px;border-radius:99px;font:600 15px 'Instrument Sans';cursor:pointer}
+nav button[aria-selected=true]{background:var(--ink);color:var(--bg)}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+main{max-width:960px;margin:18px auto 60px;padding:0 20px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+textarea,input{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit}
+textarea{min-height:150px;resize:vertical}
+label{font-weight:600;font-size:14px;display:block;margin:10px 0 4px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.btn{background:var(--pink);color:#fff;border:0;padding:11px 20px;border-radius:10px;font:600 16px 'Instrument Sans';cursor:pointer;margin:12px 8px 0 0}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat .big{font-size:1.9rem;font-weight:800}.stat small{color:var(--mute)}
+.bar{display:flex;align-items:center;gap:10px;margin:8px 0}
+.bar b{width:110px;font-weight:600;font-size:14px}
+.bar i{display:block;height:16px;border-radius:8px;background:var(--pink);min-width:4px}
+.bar em{font-style:normal;color:var(--mute);font-size:14px}
+.persona{background:var(--amber);color:#2b1d00;border-radius:14px;padding:16px;margin-bottom:16px}
+.persona .big{font-size:1.7rem;font-weight:800}
+.ins{padding:8px 0;border-top:1px dashed var(--line)}.ins:first-child{border:0}
+.meter{height:22px;border-radius:12px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;transition:width .6s}
+.flag{padding:10px 12px;border-left:5px solid var(--pink);background:var(--bg);border-radius:6px;margin:8px 0}
+.flag b{display:block}
+table{width:100%;border-collapse:collapse}td,th{padding:7px 4px;text-align:left;border-bottom:1px solid var(--line)}
+td:last-child,th:last-child{text-align:right}
+.win{background:var(--green);color:#fff;padding:16px;border-radius:14px}
+.win .big{font-size:1.6rem;font-weight:800}
+.note{color:var(--mute);font-size:13px;margin-top:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+<h1>Paisa<span>Pulse</span></h1>
+<p>Paste your UPI and bank SMS. Get a budget, catch scams before you tap, and see which tax regime saves you more. Everything runs in your browser, so your data never leaves your phone.</p>
+</header>
+<nav role="tablist">
+<button role="tab" aria-selected="true" data-t="budget">Budget from SMS</button>
+<button role="tab" aria-selected="false" data-t="scam">Scam Shield</button>
+<button role="tab" aria-selected="false" data-t="tax">Tax: old vs new</button>
+</nav>
+<main>
+
+<section id="budget" class="on">
+<div class="card">
+<label for="sms">Paste bank / UPI SMS (one per line)</label>
+<textarea id="sms" placeholder="Rs.250.00 debited from A/c XX1234 to SWIGGY via UPI..."></textarea>
+<label for="inc">Monthly income (₹, optional)</label>
+<input id="inc" type="number" min="0" placeholder="e.g. 45000">
+<button class="btn" id="go">Analyse my money</button>
+<button class="btn alt" id="demo">Try sample SMS</button>
+</div>
+<div id="bout"></div>
+</section>
+
+<section id="scam">
+<div class="card">
+<label for="msg">Paste a suspicious SMS, WhatsApp message or UPI request</label>
+<textarea id="msg" placeholder="Dear customer your KYC expires today, click bit.ly/xyz..."></textarea>
+<button class="btn" id="scan">Scan for scam</button>
+<button class="btn alt" id="sdemo">Try a fake message</button>
+</div>
+<div id="sout"></div>
+</section>
+
+<section id="tax">
+<div class="card">
+<div class="row">
+<div><label for="gross">Annual salary (₹)</label><input id="gross" type="number" value="1200000"></div>
+<div><label for="c80">80C: PPF, ELSS, LIC (max 1.5L)</label><input id="c80" type="number" value="150000"></div>
+<div><label for="d80">80D: health insurance</label><input id="d80" type="number" value="25000"></div>
+<div><label for="nps">NPS extra 80CCD(1B) (max 50k)</label><input id="nps" type="number" value="0"></div>
+<div><label for="hra">HRA exemption (₹)</label><input id="hra" type="number" value="0"></div>
+<div><label for="hl">Home loan interest (max 2L)</label><input id="hl" type="number" value="0"></div>
+</div>
+<button class="btn" id="calc">Compare regimes</button>
+</div>
+<div id="tout"></div>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* tabs */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));
+});
+
+/* ---------- BUDGET ---------- */
+const CATS={
+ 'Food & delivery':['swiggy','zomato','dominos','restaurant','cafe','hotel','biryani','chai','bakery','mcdonald','kfc'],
+ 'Groceries':['bigbasket','blinkit','zepto','dmart','supermarket','grocery','reliance fresh','milma','instamart'],
+ 'Travel & fuel':['uber','ola','rapido','irctc','redbus','petrol','fuel','indian oil','hpcl','bpcl','metro','ksrtc','flight'],
+ 'Shopping':['amazon','flipkart','myntra','meesho','ajio','nykaa','mall','lulu'],
+ 'Bills & recharge':['jio','airtel','vi ','bsnl','kseb','electricity','recharge','broadband','insurance','emi','water bill','gas'],
+ 'Fun & subscriptions':['netflix','spotify','hotstar','bookmyshow','prime','youtube','pvr','inox','steam'],
+ 'Health':['pharmacy','medplus','apollo','hospital','clinic','lab'],
+ 'Investments':['groww','zerodha','sip','mutual fund','nippon','upstox','kuvera']
+};
+const PERSONA={
+ 'Food & delivery':['Biryani Banker','Your wallet runs on delivery. A few home-cooked days would free up real money.'],
+ 'Groceries':['Basket Boss','Mostly essentials. That is a healthy pattern.'],
+ 'Travel & fuel':['Auto-rickshaw Aristocrat','Most of your money goes into moving around. Try pooling or a monthly pass.'],
+ 'Shopping':['Cart Wizard','The cart is calling. Try a 24-hour wait before every buy.'],
+ 'Bills & recharge':['Bill Warrior','Bills lead your month. Check for plans and subscriptions you can trim.'],
+ 'Fun & subscriptions':['Binge Baron','Entertainment tops the list. Audit your subscriptions.'],
+ 'Health':['Wellness Warrior','Health spending leads this month. Keep receipts for the 80D deduction.'],
+ 'Investments':['Future Self Funder','You pay your future self first. Respect.'],
+ 'Other':['Mystery Spender','Too much lands in "Other". Name your spends to understand them.']
+};
+function parseSMS(text){
+  const out=[];
+  text.split(/\n+/).forEach(line=>{
+    const l=line.trim(); if(!l) return;
+    const a=l.match(/(?:rs\.?|inr|₹)\s*([\d,]+(?:\.\d+)?)/i); if(!a) return;
+    const amt=parseFloat(a[1].replace(/,/g,'')); 
+    const credit=/credited|received|deposited|refund/i.test(l) && !/debited/i.test(l);
+    const debit=/debited|paid|sent|spent|withdrawn|purchase|txn of/i.test(l);
+    if(!credit&&!debit) return;
+    const m=l.match(/(?:\bto|\bat|towards|trf to)\s+([A-Za-z0-9 &.'-]{2,24}?)(?=\s+(?:on|via|ref|upi|from|avl|bal)\b|[.,;]|$)/i);
+    const merchant=m?m[1].trim():'Unknown';
+    const low=(l+' '+merchant).toLowerCase();
+    let cat='Other';
+    for(const k in CATS) if(CATS[k].some(w=>low.includes(w))){cat=k;break;}
+    out.push({amt,credit,merchant,cat});
+  });
+  return out;
+}
+function runBudget(){
+  const tx=parseSMS($('sms').value), out=$('bout');
+  if(!tx.length){out.innerHTML='<div class="card">No transactions found. Each line needs an amount (Rs / INR / ₹) and a word like debited or credited. Tap "Try sample SMS" to see the format.</div>';return;}
+  const sp=tx.filter(t=>!t.credit), cr=tx.filter(t=>t.credit);
+  const spent=sp.reduce((s,t)=>s+t.amt,0), got=cr.reduce((s,t)=>s+t.amt,0);
+  const by={}; sp.forEach(t=>by[t.cat]=(by[t.cat]||0)+t.amt);
+  const rows=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  const max=rows.length?rows[0][1]:1;
+  const income=+$('inc').value||got;
+  const top=rows.length?rows[0][0]:'Other';
+  const small=sp.filter(t=>t.amt<100), smallSum=small.reduce((s,t)=>s+t.amt,0);
+  const big=sp.slice().sort((a,b)=>b.amt-a.amt)[0];
+  const mer={}; sp.forEach(t=>mer[t.merchant]=(mer[t.merchant]||0)+1);
+  const fav=Object.entries(mer).sort((a,b)=>b[1]-a[1])[0];
+  const p=PERSONA[top];
+  let h='<div class="persona"><small>Your money personality</small><div class="big">'+p[0]+'</div>'+p[1]+'</div>';
+  h+='<div class="stats"><div class="stat"><small>Total spent</small><div class="big">'+inr(spent)+'</div></div>'
+   +'<div class="stat"><small>Money in</small><div class="big">'+inr(got)+'</div></div>'
+   +'<div class="stat"><small>Transactions</small><div class="big">'+tx.length+'</div></div>'
+   +'<div class="stat"><small>Saved (if income given)</small><div class="big">'+(income?inr(Math.max(income-spent,0)):'–')+'</div></div></div>';
+  h+='<div class="card"><h3>Where it went</h3>'+rows.map(r=>'<div class="bar"><b>'+r[0]+'</b><i style="width:'+Math.max(r[1]/max*60,2)+'%"></i><em>'+inr(r[1])+' ('+Math.round(r[1]/spent*100)+'%)</em></div>').join('')+'</div>';
+  const ins=[];
+  if(big) ins.push('Biggest single spend: <b>'+inr(big.amt)+'</b> at '+esc(big.merchant)+'.');
+  if(fav&&fav[1]>1) ins.push('You paid <b>'+esc(fav[0])+'</b> '+fav[1]+' times. Is it a habit or a subscription?');
+  if(small.length>=2) ins.push('Small-payment leak: <b>'+small.length+'</b> UPI payments under ₹100 added up to <b>'+inr(smallSum)+'</b>. Tiny taps add up.');
+  if(income){
+    const rate=(income-spent)/income*100;
+    ins.push(rate>=20?'You are saving about <b>'+Math.round(rate)+'%</b> of income. That meets the 20% savings rule.':'You are saving about <b>'+Math.max(Math.round(rate),0)+'%</b>. The 50/30/20 rule suggests aiming for 20%. Even a ₹500 monthly SIP is a start.');
+    ins.push('50/30/20 target for your income: needs <b>'+inr(income*.5)+'</b>, wants <b>'+inr(income*.3)+'</b>, savings <b>'+inr(income*.2)+'</b>.');
+  }
+  h+='<div class="card"><h3>Insights</h3>'+ins.map(i=>'<div class="ins">'+i+'</div>').join('')+'</div>';
+  out.innerHTML=h;
+}
+$('go').onclick=runBudget;
+$('demo').onclick=()=>{
+  $('sms').value=`Rs.349.00 debited from A/c XX4821 to SWIGGY via UPI. Ref 4021
+Rs.1,899.00 debited from A/c XX4821 to AMAZON PAY via UPI
+Rs.45.00 debited from A/c XX4821 to CHAI POINT via UPI
+Rs.30.00 paid to KSRTC via UPI
+Rs.649.00 debited to JIO RECHARGE via UPI
+Rs.2,500.00 debited to BIGBASKET via UPI
+Rs.480.00 debited to UBER INDIA via UPI
+Rs.199.00 debited to NETFLIX via UPI
+Rs.60.00 sent to CHAI POINT via UPI
+Rs.5,000.00 debited towards GROWW SIP
+Rs.45,000.00 credited to A/c XX4821 salary from ACME LTD`;
+  $('inc').value=45000; runBudget();
+};
+
+/* ---------- SCAM SHIELD ---------- */
+const RULES=[
+ [/collect request|request money|enter (your )?(upi )?pin to (receive|get|accept)/i,40,'Fake collect request','You never need your PIN to receive money. Entering it sends money out.'],
+ [/\botp\b|one.?time password|cvv|\bpin\b/i,30,'Asks for OTP / PIN / CVV','Banks never ask for these on call, SMS or chat.'],
+ [/kyc|pan.*(update|expire|block)|aadhaar.*(link|update)|account.*(block|suspend|freez)/i,30,'KYC / account-block threat','This is the classic phishing hook. Visit your bank app directly.'],
+ [/urgent|immediately|within \d+ (hours|mins|minutes)|today only|last chance|expires? today/i,15,'Pressure and urgency','Scammers rush you so you do not think.'],
+ [/bit\.ly|tinyurl|t\.co\/|goo\.gl|cutt\.ly|https?:\/\/[^ ]*\.(xyz|top|click|info|live|cc)\b/i,25,'Shortened or odd link','Real banks use their own full domains.'],
+ [/won|lottery|prize|reward points|cashback of|gift card|lucky/i,25,'Too-good-to-be-true reward','You cannot win a contest you never entered.'],
+ [/work from home|part.?time job|earn ₹?\s?\d+.*(day|daily)|like and earn|task.*(earn|commission)/i,25,'Fake job or task scam','Paying first to earn later is a scam pattern.'],
+ [/refund|reversal|wrongly (sent|transferred)|sent by mistake/i,20,'Refund / wrong-transfer story','Scammers trick you into "returning" money or approving a request.'],
+ [/anydesk|teamviewer|quicksupport|screen share|install.*app|\.apk/i,35,'Remote-access or APK install','This gives scammers full control of your phone.'],
+ [/electricity.*(disconnect|cut)|sim.*(block|deactivate)|customs|parcel.*(held|seized)|cbi|police|arrest/i,25,'Authority impersonation','Real agencies do not demand money by phone or SMS.']
+];
+function scan(){
+  const t=$('msg').value.trim(), out=$('sout');
+  if(!t){out.innerHTML='<div class="card">Paste a message first.</div>';return;}
+  let score=0; const hit=[];
+  RULES.forEach(r=>{if(r[0].test(t)){score+=r[1];hit.push(r);}});
+  score=Math.min(score,100);
+  const lvl=score>=60?['High risk. Do not engage',' var(--pink)']:score>=30?['Suspicious. Verify first','var(--amber)']:['Looks low risk','var(--green)'];
+  let h='<div class="card"><h3>'+lvl[0]+'</h3><div class="big" style="font-size:2.4rem;margin:6px 0">'+score+'/100</div><div class="meter"><i style="width:'+score+'%;background:'+lvl[1]+'"></i></div></div>';
+  if(hit.length) h+='<div class="card"><h3>Red flags found</h3>'+hit.map(r=>'<div class="flag"><b>'+r[2]+'</b>'+r[3]+'</div>').join('')+'</div>';
+  h+='<div class="card"><h3>What to do</h3><div class="ins">Never share OTP, PIN or CVV with anyone.</div><div class="ins">Do not click links. Open your bank app yourself.</div><div class="ins">If money is lost, call <b>1930</b> or report at cybercrime.gov.in within the first hours.</div></div>';
+  h+='<p class="note">This is a rule-based checker for learning, not a guarantee. When in doubt, call your bank on its official number.</p>';
+  out.innerHTML=h;
+}
+$('scan').onclick=scan;
+$('sdemo').onclick=()=>{$('msg').value='URGENT: Your SBI account will be blocked today. Update KYC now: bit.ly/sbi-kyc-9x and share the OTP sent to your phone.';scan();};
+
+/* ---------- TAX (slabs per FY 2025-26 rules; verify latest) ---------- */
+function slab(inc,s){let t=0,prev=0;for(const[l,r]of s){if(inc>prev)t+=(Math.min(inc,l)-prev)*r;prev=l;}return t;}
+const NEW=[[400000,0],[800000,.05],[1200000,.10],[1600000,.15],[2000000,.20],[2400000,.25],[Infinity,.30]];
+const OLD=[[250000,0],[500000,.05],[1000000,.20],[Infinity,.30]];
+function taxNew(g){
+  const ti=Math.max(g-75000,0); let t=slab(ti,NEW);
+  if(ti<=1200000) t=0; else t=Math.min(t,ti-1200000);
+  return {ti,tax:t*1.04};
+}
+function taxOld(g,d){
+  const ti=Math.max(g-50000-d,0); let t=slab(ti,OLD);
+  if(ti<=500000) t=0;
+  return {ti,tax:t*1.04};
+}
+$('calc').onclick=()=>{
+  const v=id=>Math.max(+$(id).value||0,0);
+  const g=v('gross');
+  const ded=Math.min(v('c80'),150000)+Math.min(v('nps'),50000)+v('d80')+v('hra')+Math.min(v('hl'),200000);
+  const n=taxNew(g), o=taxOld(g,ded), diff=Math.abs(n.tax-o.tax);
+  const best=n.tax<=o.tax?'New regime':'Old regime';
+  let h='<div class="win"><small>Better for you</small><div class="big">'+best+'</div>You save about <b>'+inr(diff)+'</b> a year ('+inr(diff/12)+' a month).</div>';
+  h+='<div class="card" style="margin-top:16px"><table><tr><th></th><th>Old</th><th>New</th></tr>'
+   +'<tr><td>Standard deduction</td><td>₹50,000</td><td>₹75,000</td></tr>'
+   +'<tr><td>Other deductions used</td><td>'+inr(ded)+'</td><td>Not allowed</td></tr>'
+   +'<tr><td>Taxable income</td><td>'+inr(o.ti)+'</td><td>'+inr(n.ti)+'</td></tr>'
+   +'<tr><td><b>Tax with 4% cess</b></td><td><b>'+inr(o.tax)+'</b></td><td><b>'+inr(n.tax)+'</b></td></tr></table></div>';
+  const bp=ded>0?Math.round(ded):0;
+  h+='<div class="card"><h3>In plain words</h3>'
+   +'<div class="ins">The <b>old regime</b> has higher rates but lets you subtract deductions like 80C, 80D, HRA and home-loan interest.</div>'
+   +'<div class="ins">The <b>new regime</b> has lower rates and almost no deductions. Salary up to about ₹12.75 lakh pays zero tax after the rebate.</div>'
+   +'<div class="ins">Your deductions total '+inr(bp)+'. '+(best==='Old regime'?'They are big enough to beat the new regime.':'They are not big enough to beat the lower new-regime rates.')+'</div></div>'
+   +'<p class="note">Educational estimate for salaried individuals under 60. Uses FY 2025-26 slabs, ignores surcharge and other income. Check the latest rules on incometax.gov.in or with a CA before filing.</p>';
+  $('tout').innerHTML=h;
+};
+</script>
+</body>
+</html>
